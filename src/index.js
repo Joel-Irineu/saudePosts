@@ -4,62 +4,42 @@ import {
     View, 
     Text, 
     StyleSheet,
-    TouchableOpacity, 
-    TextInput,
-    AsyncStorage,
-    Keyboard,
+    TouchableOpacity,
+    Modal 
 } from 'react-native'
 
+import ModalView from './componets/ModalView'
+
 export default function Main(){
-    const [input, setInput] = useState('')
-    const [name, setName] = useState('')
+    const [modalVisible, setModalVisible] = useState(false)
 
-
-    async function componentDidMount(){
-        await AsyncStorage.getItem('name').then( value => {
-            setName(value)
-        })
-    }
-
-    async function componentDidUpdate(_, prevState){
-        if(prevState !== name){
-            await AsyncStorage.setItem('name', name)
+    function enter(){
+        if(modalVisible === false){
+            setModalVisible(true)
+        }else{
+            setModalVisible(false)
         }
     }
 
-    
-
-    function saveName(){
-        setName(input)
-        alert('salvo com sucesso')
-        Keyboard.dismiss()
-        setInput('')
-    }
-
-    componentDidMount()
-    componentDidUpdate()
-    
     return(
         <View style={styles.container}>
             <StatusBar/>
-                <View style={styles.viewInput}>
-                    <TextInput 
-                        style={styles.input}
-                        value={input}
-                        underlineColorAndroid='transparent'
-                        onChangeText={(text) => setInput(text)}
-                        placeholder='Digite seu nome aqui...'
-                    />
+                <TouchableOpacity
+                    style={styles.btn}
+                    onPress={enter}
+                >
+                    <Text style={styles.btnText}>Entrar</Text>
+                </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        style={styles.btn}
-                        onPress={saveName}
-                    >
-                        <Text style={styles.btnText}>+</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={styles.text}>{name}</Text>
+                <Modal
+                    transparent={true}
+                    animationType='slide'
+                    visible={modalVisible}  
+                >
+                    <View style={{margin: 15, flex: 1, alignItems: 'center', justifyContent: 'center',}}>
+                        <ModalView data={enter} />
+                    </View>
+                </Modal>
         
         </View>
     )
@@ -68,12 +48,9 @@ export default function Main(){
 const styles = StyleSheet.create({
     container:{
         flex: 1,
-        alignItems: 'center'
-    },
-    viewInput:{
-        marginTop: 10,
-        flexDirection: 'row',
-
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 15,
     },
     input:{
         width: '80%',
@@ -84,9 +61,10 @@ const styles = StyleSheet.create({
     },  
     btn:{
         backgroundColor: '#262626',
-        width: '15%',
+        width: '80%',
         height: 45,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignSelf: 'center'
     },
     btnText:{
         fontSize: 20,
@@ -99,4 +77,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 15,
     },
+    modalView:{
+        width: '100%',
+        height: 200,
+        backgroundColor: '#ecec00',
+        alignSelf: 'center'
+    }
 })
