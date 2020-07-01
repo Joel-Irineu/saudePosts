@@ -14,6 +14,21 @@ export default function Main(){
     const [input, setInput] = useState('')
     const [name, setName] = useState('')
 
+
+    async function componentDidMount(){
+        await AsyncStorage.getItem('name').then( value => {
+            setName(value)
+        })
+    }
+
+    async function componentDidUpdate(_, prevState){
+        if(prevState !== name){
+            await AsyncStorage.setItem('name', name)
+        }
+    }
+
+    
+
     function saveName(){
         setName(input)
         alert('salvo com sucesso')
@@ -21,19 +36,7 @@ export default function Main(){
         setInput('')
     }
 
-    async function componentDidMount(){
-        await AsyncStorage.getItem('name').then((value) => {
-            setName(value)
-        })
-    }
-
     componentDidMount()
-
-    async function componentDidUpdate(_, prevState){
-        if(prevState !== name){
-            await AsyncStorage.setItem('name', name)
-        }
-    }
     componentDidUpdate()
     
     return(
@@ -45,7 +48,7 @@ export default function Main(){
                         value={input}
                         underlineColorAndroid='transparent'
                         onChangeText={(text) => setInput(text)}
-                        placeholder='irineu'
+                        placeholder='Digite seu nome aqui...'
                     />
 
                     <TouchableOpacity 
