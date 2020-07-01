@@ -1,114 +1,99 @@
 import React, { useState } from 'react'
-import { StatusBar, View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native'
-import FeedItens from './Components/Feed'
-
-import logo from './assets/logo.png'
-import send from './assets/send.png'
-import camera from './assets/camera.png'
-
-import feed from './services/feed'
+import { 
+    StatusBar, 
+    View, 
+    Text, 
+    StyleSheet,
+    TouchableOpacity, 
+    TextInput,
+    AsyncStorage,
+    Keyboard,
+} from 'react-native'
 
 export default function Main(){
-    const [data, setData] = useState(feed)
+    const [input, setInput] = useState('')
+    const [name, setName] = useState('')
 
+    function saveName(){
+        setName(input)
+        alert('salvo com sucesso')
+        Keyboard.dismiss()
+        setInput('')
+    }
 
-  return(
-    <View style={styles.container}>
-        <StatusBar/>
-        <View style={styles.header}>
-            <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity style={{paddingRight: 3}}>
-                        <Image 
-                            source={camera}
-                            style={styles.camera}
-                        />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image 
-                        source={logo}
-                        style={styles.logo}
+    async function componentDidMount(){
+        await AsyncStorage.getItem('name').then((value) => {
+            setName(value)
+        })
+    }
+
+    componentDidMount()
+
+    async function componentDidUpdate(_, prevState){
+        if(prevState !== name){
+            await AsyncStorage.setItem('name', name)
+        }
+    }
+    componentDidUpdate()
+    
+    return(
+        <View style={styles.container}>
+            <StatusBar/>
+                <View style={styles.viewInput}>
+                    <TextInput 
+                        style={styles.input}
+                        value={input}
+                        underlineColorAndroid='transparent'
+                        onChangeText={(text) => setInput(text)}
+                        placeholder='irineu'
                     />
-            </TouchableOpacity>
-            </View>
-           
-           <TouchableOpacity>
-                <Image 
-                    source={send}
-                    style={styles.send}
-                />
-           </TouchableOpacity>
-        </View>
 
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-        >
-            <FlatList 
-                style={styles.storys}
-                keyExtractor={(item) => item.id}
-                showsHorizontalScrollIndicator={false}
-                horizontal={true}
-                data={data}
-                renderItem={({item}) => ( 
-                    <TouchableOpacity>
-                        <Image 
-                            source={{uri: item.imgperfil}}
-                            style={styles.profileImg}
-                        />
+                    <TouchableOpacity 
+                        style={styles.btn}
+                        onPress={saveName}
+                    >
+                        <Text style={styles.btnText}>+</Text>
                     </TouchableOpacity>
-                )}
-            />
+                </View>
 
-            <FlatList 
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                data={data}
-                renderItem={({item}) => ( <FeedItens data={item} />)}
-            />
-        </ScrollView>
-      
-    </View>
-  )
+                <Text style={styles.text}>{name}</Text>
+        
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
     container:{
         flex: 1,
+        alignItems: 'center'
     },
-    header:{
-        height: 55,
-        backgroundColor: '#fff',
+    viewInput:{
+        marginTop: 10,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+
+    },
+    input:{
+        width: '80%',
+        borderWidth: 1,
+        height: 45,
         padding: 5,
-
-        borderBottomWidth: .3,
-        shadowColor: '#000',
-        elevation: 1,
+        borderColor: '#262626',
+    },  
+    btn:{
+        backgroundColor: '#262626',
+        width: '15%',
+        height: 45,
+        justifyContent: 'center'
     },
-    camera:{
-        width: 28,
-        height: 25,
+    btnText:{
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#f3f3f3',
     },
-    logo:{
-
+    text:{
+        fontSize: 30,
+        textAlign: 'center',
+        marginTop: 15,
     },
-    send:{
-        width: 25,
-        height: 25,
-    },
-    storys:{
-        height: 65,
-        marginTop: 7,
-    },
-    profileImg:{
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        alignSelf: 'center',
-        margin: 5,
-        borderWidth: 2,
-        borderColor: '#D67707',
-    },
-
 })
