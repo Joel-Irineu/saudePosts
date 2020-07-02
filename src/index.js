@@ -1,46 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
     StatusBar, 
     View, 
-    Text, 
     StyleSheet,
-    TouchableOpacity,
-    Modal 
+    FlatList,
+    ActivityIndicator
 } from 'react-native'
 
-import ModalView from './componets/ModalView'
+import api from './services/api'
+import Filmes from './Filmes'
 
 export default function Main(){
-    const [modalVisible, setModalVisible] = useState(false)
+    const [filmes, setFilmes] = useState('')
+    const [loading, setLoading] = useState(true)
 
-    function enter(){
-        if(modalVisible === false){
-            setModalVisible(true)
-        }else{
-            setModalVisible(false)
+    useEffect(()=>{
+        async function getFilem(){
+            const response = await api.get('rn-api/?api=posts')
+            setFilmes(response.data)
+            setLoading(false)
         }
-    }
+        getFilem()
+    },[])
 
     return(
         <View style={styles.container}>
             <StatusBar/>
-                <TouchableOpacity
-                    style={styles.btn}
-                    onPress={enter}
-                >
-                    <Text style={styles.btnText}>Entrar</Text>
-                </TouchableOpacity>
-
-                <Modal
-                    transparent={true}
-                    animationType='slide'
-                    visible={modalVisible}  
-                >
-                    <View style={{margin: 15, flex: 1, alignItems: 'center', justifyContent: 'center',}}>
-                        <ModalView data={enter} />
-                    </View>
-                </Modal>
-        
+            {loading === true ?(
+                <ActivityIndicator color='#09a6ff' size={80} />
+            ):(
+                <FlatList 
+                    keyExtractor={item => item.id.toString()}
+                    data={filmes}
+                    renderItem={({item})=> <Filmes data={item}/>}
+                />
+            )}
         </View>
     )
 }
@@ -77,10 +71,4 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 15,
     },
-    modalView:{
-        width: '100%',
-        height: 200,
-        backgroundColor: '#ecec00',
-        alignSelf: 'center'
-    }
 })
